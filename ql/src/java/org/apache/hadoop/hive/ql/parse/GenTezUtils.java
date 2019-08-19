@@ -271,6 +271,15 @@ public class GenTezUtils {
               rsOpToTsOpMap.put(rs, (TableScanOperator) newRoot);
             }
           }
+          // This TableScanOperator could also be part of other events in eventOperatorSet.
+          for(AppMasterEventOperator event: context.eventOperatorSet) {
+            if(event.getConf() instanceof DynamicPruningEventDesc) {
+              TableScanOperator ts = ((DynamicPruningEventDesc) event.getConf()).getTableScan();
+              if(ts.equals(orig)){
+                ((DynamicPruningEventDesc) event.getConf()).setTableScan((TableScanOperator) newRoot);
+              }
+            }
+          }
         }
         context.rootToWorkMap.remove(orig);
         context.rootToWorkMap.put(newRoot, work);
